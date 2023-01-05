@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, ScrollView } from 'react-native'
+import { View, Text, Share, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { firebase } from '../config';
 import { FontAwesome } from '@expo/vector-icons';
@@ -8,6 +8,8 @@ import GroupButton from '../Components/GroupButton';
 // import { Modal } from 'react-native';
 import Modal from 'react-native-modal';
 import { assertionError } from '@firebase/util';
+import * as Clipboard from 'expo-clipboard';
+
 export default function Home(props) {
     const [todos, setTodos] = useState([]);
     const [userData, setUserData] = useState(props.route.params.user);
@@ -101,6 +103,32 @@ export default function Home(props) {
             setGroupCodeError(error.toString())
             console.log("Catch group code set", error)
         })
+    }
+
+    const onShare = async (groupData) => {
+        try {
+          const result = await Share.share({
+            // title: 'Join ' + groupData.groupName + ' by using this code:',
+            message:
+              `Join ${groupData.groupName} by using this code: \n${groupData.groupCode}`,
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+
+    const onClickCopy = (id) => 
+    {
+        Clipboard.setStringAsync(id)
     }
 
     //fetch or read data from firebase
@@ -229,6 +257,8 @@ export default function Home(props) {
             renderItem = { ({item}) => (
                 <GroupButton key={item.id} 
                     {...item} 
+                    onClickShare={() => onShare(item)}
+                    onClickCopy={() => onClickCopy(item.groupCode)}
                     onClick={() => onGroupButtonClicked(item.id)} />
             )
             }

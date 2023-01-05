@@ -1,20 +1,67 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { FontAwesome } from '@expo/vector-icons'
+import React, { useEffect, useState } from 'react'
+import { FontAwesome, Entypo } from '@expo/vector-icons'
+import {
+    Menu,
+    MenuProvider,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+   } from "react-native-popup-menu";
 
 export default function GroupButton(props) {
-   
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [userData, setUserData] = useState(props);
+
+
+    useEffect(() => {
+        // setUserData(userData)
+    }, [])
+
+    const onSharePress = () => {
+        props.onClickShare()
+        // close
+    }
+
+    const onClickCopy = () => {
+        props.onClickCopy()
+    }
 
   return (
     <View>
-        <TouchableOpacity style={styles.container} onPress={() => props.onClick()}>
+        <TouchableOpacity style={styles.container} 
+            activeOpacity={0.7} 
+            disabled={isMenuOpen} 
+            onPress={() => props.onClick()}>
             <View style={styles.header}>
                 <Text ellipsizeMode='tail' numberOfLines={1} style={styles.title}>{props.groupName}</Text>
-                <FontAwesome name='trash-o' color={'white'} style={styles.trash}/>              
+                {/* <FontAwesome name='trash-o' color={'white'} style={styles.trash}/>               */}
+                
+                    <Menu style={styles.menu}>
+                        <MenuTrigger
+                            // text="Click for Option menu"
+                            customStyles={{
+                            triggerWrapper: {
+                                top: 0,
+                                padding: 20,
+                                paddingRight: 0,
+                                paddingTop: 0
+                            },   
+                            }}
+                        >
+                            <Entypo name="dots-three-vertical" size={20} color="white" />
+
+                        </MenuTrigger>
+                        <MenuOptions>
+                            <MenuOption style={styles.menuOption} onSelect={() => onSharePress()} text="Share" />
+                            <MenuOption style={styles.menuOption} onSelect={() => onClickCopy()} text="Copy Group Code" />
+                            
+                            {/* <MenuOption onSelect={() => alert(`Delete`)} text="Delete" /> */}
+                        </MenuOptions>
+                    </Menu>
             </View>
             <Text style={styles.members}>Members: {props.members.length}</Text>
         </TouchableOpacity>
-        
         
     </View>
   )
@@ -40,6 +87,17 @@ const styles = StyleSheet.create({
     trash: {
         position:'absolute',
         right: 0
+    },
+    menu: {
+        position: 'absolute',
+        right: 0,
+        // marginTop: 10,
+        padding: 40,
+        paddingTop: 0,
+        paddingRight: 0
+    },
+    menuOption: {
+        padding: 10
     },
     title: {
         fontSize: 20,

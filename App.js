@@ -10,6 +10,7 @@ import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import Settings from './Screens/Settings';
 import CreateGroup from './Screens/CreateGroup';
 import { MenuProvider } from 'react-native-popup-menu';
+import GroupView from './Screens/GroupView';
 
 const Stack = createStackNavigator();
 
@@ -30,13 +31,18 @@ export default function App() {
               />
               <Stack.Screen
                 name='ForgotPassword'
-                options={{headerShown: true}}   
+                options={{headerShown: true, title: 'Password Reset'}}   
                 component={ForgotPasswordScreen}
               />
               <Stack.Screen 
                 name='Home'
-                options={{headerShown: false}}       
+                options={{headerShown: false,}}       
                 component={Home}
+              />
+              <Stack.Screen 
+                name='GroupView'
+                options={{headerShown: true}}       
+                component={GroupView}
               />
               <Stack.Screen 
                 name='CreateGroup'

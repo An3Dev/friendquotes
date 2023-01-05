@@ -4,6 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import styles from './styles';
 import { firebase, } from '../config'
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function RegistrationScreen() {
@@ -84,7 +85,7 @@ export default function RegistrationScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <KeyboardAwareScrollView
                 style={{ flex: 1, width: '100%' }}
                 keyboardShouldPersistTaps="always">
@@ -148,7 +149,7 @@ export default function RegistrationScreen() {
                     <Text style={styles.footerText}>Already got an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Log in</Text></Text>
                 </View>
             </KeyboardAwareScrollView>
-        </View>
+        </SafeAreaView>
     )
 }
 

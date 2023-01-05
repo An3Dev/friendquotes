@@ -187,13 +187,15 @@ export default function Home(props) {
         navigation.navigate('CreateGroup', userData)
     };
 
-    const onGroupButtonClicked = (id) => {
-        alert(id)
-        console.log("Group with id", id, "was clicked")
+    const onGroupButtonClicked = (data) => {
+        // alert(id)
+        // console.log("Group with id", id, "was clicked")
+        navigation.navigate('GroupView', {groupData: data})
     }
+
   return (
     
-    <View style={styles.entireContainer}>
+    <SafeAreaView style={styles.entireContainer}>
 
         <Modal isVisible={isJoinModaVisible} 
             animationIn={'fadeInUp'} 
@@ -243,15 +245,8 @@ export default function Home(props) {
                             <FontAwesome name='cog' color={'black'} style={styles.settingsCog}/>
                         </TouchableOpacity>
                     </View>
-                    
-                
-                    {/* <TouchableOpacity style={styles.button} onPress={() => {
-                            addTodo()
-                        }
-                    } /> */}
                 </View>
             }
-            // styles={{backgroundColor: 'black'}}
             data={groupData}
             numColumns={1}
             renderItem = { ({item}) => (
@@ -259,7 +254,7 @@ export default function Home(props) {
                     {...item} 
                     onClickShare={() => onShare(item)}
                     onClickCopy={() => onClickCopy(item.groupCode)}
-                    onClick={() => onGroupButtonClicked(item.id)} />
+                    onClick={() => onGroupButtonClicked(item)} />
             )
             }
 
@@ -273,7 +268,7 @@ export default function Home(props) {
                 </TouchableOpacity>
             }
         />
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -286,7 +281,7 @@ const styles = StyleSheet.create({
     },
     container:{
         padding: 15,
-        marginTop: 30,
+        // marginTop: 30,
         flexDirection: 'row',
         // backgroundColor: 'red',
         justifyContent: 'center',

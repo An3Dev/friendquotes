@@ -57,7 +57,7 @@ export default function ForgotPasswordScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <ScrollView
                 style={{ flex: 1, width: '100%' }}
                 keyboardShouldPersistTaps="always">
@@ -96,7 +96,7 @@ export default function ForgotPasswordScreen() {
                     <Text style={styles.footerText}>Did you <Text onPress={onForgotPasswordPress} style={styles.footerLink}>Forget your password?</Text></Text>
                 </View> */}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     )
 }
 

@@ -5,7 +5,8 @@ import { firebase } from '../config'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Settings() {
+export default function Settings(props) {
+    const [userData, setUserData] = useState(props.route.params.user);
     const navigation = useNavigation();
     const onLogOutPress = () => {
         firebase

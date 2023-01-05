@@ -8,7 +8,7 @@ import LoginScreen from './Screens/LoginScreen';
 import RegistrationScreen from './Screens/RegistrationScreen';
 import ForgotPasswordScreen from './Screens/ForgotPasswordScreen';
 import Settings from './Screens/Settings';
-import CreaterGroup from './Screens/CreateGroup';
+import CreateGroup from './Screens/CreateGroup';
 
 const Stack = createStackNavigator();
 
@@ -39,7 +39,7 @@ export default function App() {
             <Stack.Screen 
               name='CreateGroup'
               options={{headerShown: true}}       
-              component={CreaterGroup}
+              component={CreateGroup}
             />
             <Stack.Screen 
               name='Settings'

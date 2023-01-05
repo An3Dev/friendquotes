@@ -1,18 +1,22 @@
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { firebase } from '../config';
 import { FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupButton from '../Components/GroupButton';
 export default function Home(props) {
     const [todos, setTodos] = useState([]);
-    const userData = props.route.params.user;
+    const [userData, setUserData] = useState(props.route.params.user);
     const groupRef = firebase.firestore().collection('groups');
+    const usersRef = firebase.firestore().collection('users');
+
     const [addData, setAddData] = useState('');
     const navigation = useNavigation();
 
     const [groupData, setGroupData] = useState([])
+
+    const isFocused = useIsFocused();
     // const test = props.test
 
     // useEffect(() =>
@@ -20,103 +24,59 @@ export default function Home(props) {
     //     setAddData(userData.fullName)
     // }, [todos])
     //fetch or read data from firebase
-    useEffect(() => 
-        {     
-            // console.log("Data: " + userData.groups)
-            if (userData.groups.length > 0)
-            {
-                const groupsIds = []
-                // console.log(typeof(userData.groups))
-                userData.groups.forEach(element => {
-                    groupsIds.push(element)
-                    // console.log(element)
-                });
-                // console.log("GROUP ID", groupsIds);
-                const groupData = []
-                // groupsIds.forEach(id => {
-                //     console.log("ID: ", id)
-                //     groupRef.doc(id).get()
-                //     .then(firestoreDocument => {            
-                //         groupData.push(firestoreDocument.data());
-                //     }).catch((e) => {
-                //         console.log("Error retrieving" + e)
-                //     }).then(() => {
-                //         console.log(groupData)
-                //         setGroupData(groupData)
-                //     })
-                // })
-                // alert(groupsIds)
-                // groupRef.get().then((data) => {
-                //     data.docs.forEach(doc => {
-                //         console.log(doc.data())
-                //     })   
-                // })
-                
-                // TODO: paginate this in the future.
-                groupRef.where('id', 'in', groupsIds).get()
-                .then((data) => {
-                    data.docs.forEach((doc) => {
-                        console.log(doc.data().id)
-                        groupData.push(doc.data())
-                    })
-                    setGroupData(groupData)
-                }).catch((error) => {
-                    alert(error)
-                })
-            }   
-        }, [])
+    const fetchGroups = (userData) => {
+        // console.log(userData)
+        if (userData.groups.length > 0)
+        {
+            const groupsIds = []
+            userData.groups.forEach(element => {
+                groupsIds.push(element)
+                // console.log(element)
+            }); 
+            const groupData = []
+            // alert("IDS:" + groupsIds)
 
-    const deleteTodo = (todos) => {
-        groupRef
-        .doc(todos.id)
-        .delete()
-        .then(() => {
-            // show successful deletion
-            alert("Delete Successfully")
-        })
-        .catch( error => {
-            alert(error);
-        })
+            // TODO: paginate this in the future.
+            groupRef.where('id', 'in', groupsIds).get()
+            .then(data => {
+                setGroupData([])
+                data.docs.forEach((doc) => {
+                    // console.log(doc.data().id)
+                    const members = doc.data().members
+                    // make sure that the group doc has this user in it
+                    members.forEach(member => {
+                        if (member === userData.uid){
+                            // console.log("Member matches")
+                            groupData.push(doc.data())
+                        }
+                    })
+                    // console.log("Members for", doc.data().groupName, members)
+                })
+                setGroupData(groupData)  
+            }).catch((error) => {
+                console.log(error)
+            })
+        } 
     }
 
-    //add a todo
-    const addTodo =  () => {
-        alert(addData.length)
-        if (addData && addData.length > 0)
-        {
-            const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-            const {description, heading, interval, use_intervals, time_to_remind, is_done} = addData;
-            const data = {
-                uid: userData.id,
-                heading: heading,
-                description: description,
-                interval: interval,
-                use_intervals: use_intervals,
-                time_to_remind: time_to_remind, 
-                is_done: is_done,
-                timestamp: timestamp
-            };
-            
-
-            groupRef
-                .add(data)
-                .then(() => {
-                    setAddData('');
-                    Keyboard.dismiss();
-                })
-                .catch((error) => 
-                {
-                    alert(error);
-                })
-        }
+    const setData = () => {
+        usersRef.doc(userData.uid).onSnapshot(dataSnapshot => {
+            setUserData(dataSnapshot.data())
+            fetchGroups(dataSnapshot.data()) 
+          })
     }
     
+    useEffect(() => {
+        console.log("Use effect")
+        setData()
+    }, [isFocused]);
+
     const onSettingsPressed = () => {
-        navigation.navigate('Settings')
+        navigation.navigate('Settings', userData)
     };
 
     const onPlusPressed = () => {
-        navigation.navigate('CreateGroup')
+        navigation.navigate('CreateGroup', userData)
     };
 
     const onGroupButtonClicked = (id) => {
@@ -125,61 +85,66 @@ export default function Home(props) {
     }
   return (
     
-    <View style={{flex: 1}}>
-        <View style={styles.container}>
-            <Text style={styles.titleText}>
-                Friend Quotes
-            </Text>
-
-            <View style={styles.topRightButtons}>
-                <TouchableOpacity onPress={ () => {
-                    onPlusPressed();
-                }}>
-                    <FontAwesome name="plus-square-o"  style={styles.plus}/>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={ () => {
-                    onSettingsPressed();
-                }}>
-                    <FontAwesome name='cog' color={'black'} style={styles.settingsCog}/>
-                </TouchableOpacity>
-            </View>
+    <View style={styles.entireContainer}>
             
-          
-            {/* <TouchableOpacity style={styles.button} onPress={() => {
-                    addTodo()
-                }
-            } /> */}
-        </View>
-        <FlatList 
-            // styles={{backgroundColor: 'black'}}
-            data={groupData}
-            numColumns={1}
-            renderItem = { ({item}) => (
-                <GroupButton key={item.id} {...item} onClick={() => onGroupButtonClicked(item.id)} />
-                // <View>
-                //     <TouchableOpacity style={styles.item} 
-                //         onPress={() => {
-                //             onGroupButtonClicked(item.id)
-                //     }}>
-                //         {/* <FontAwesome name='trash-o' color={'red'} style={styles.trash}/>               */}
+            <FlatList 
+                ListHeaderComponent={
+                    <View style={styles.container}>
+                        <Text style={styles.titleText}>
+                            Friend Quotes
+                        </Text>
+
+                        <View style={styles.topRightButtons}>
+                            <TouchableOpacity onPress={ () => {
+                                onPlusPressed();
+                            }}>
+                                <FontAwesome name="plus-square-o"  style={styles.plus}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={ () => {
+                                onSettingsPressed();
+                            }}>
+                                <FontAwesome name='cog' color={'black'} style={styles.settingsCog}/>
+                            </TouchableOpacity>
+                        </View>
                         
-                //         <Text styles={styles.itemText}>
-                //             {item.groupName}
-                //         </Text>
-                //         <Text styles={styles.itemText}>
-                //             {item.lastQuote}
-                //         </Text>
-                //     </TouchableOpacity>
                     
-                // </View>
-            ) 
-            }
-        />
+                        {/* <TouchableOpacity style={styles.button} onPress={() => {
+                                addTodo()
+                            }
+                        } /> */}
+                    </View>
+                }
+                // styles={{backgroundColor: 'black'}}
+                data={groupData}
+                numColumns={1}
+                renderItem = { ({item}) => (
+                    <GroupButton key={item.id} 
+                        {...item} 
+                        onClick={() => onGroupButtonClicked(item.id)} />
+                ) 
+                }
+
+                ListFooterComponent={
+                    <TouchableOpacity style={styles.join} onPress={() => {}}>
+                        <View style={styles.header}>
+                            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.joinText}>Join new group?</Text>
+                            {/* <FontAwesome name='trash-o' color={'black'} style={styles.trash}/>               */}
+                        </View>
+                        {/* <Text>Members: {props.members.length}</Text> */}
+                    </TouchableOpacity>
+                }
+            />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+    entireContainer: {
+        flex: 1,
+        flexDirection:'column',
+        justifyContent: 'center',
+        // alignContent: 'center'
+    },
     container:{
         padding: 15,
         marginTop: 30,
@@ -193,6 +158,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         
+    },
+    join: {
+      backgroundColor: '#91a1e9',
+
+      marginLeft: 20,
+      marginRight: 20,
+    //   marginTop: 20,
+      height: 48,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: 'center'
+    },
+    joinText:{
+        fontSize: 16
     },
     topRightButtons: {
         flexDirection: 'row',

@@ -3,12 +3,77 @@ import { Image, ScrollView, Text, TextInput, TouchableOpacity, View, StyleSheet 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import styles from './styles';
-// import { firebase } from '../config'
-// import { useNavigation, StackActions } from '@react-navigation/native';
+import { firebase } from '../config'
+import { useNavigation, StackActions } from '@react-navigation/native';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values'
+import { customAlphabet } from 'nanoid';
+// import { nanoid } from 'nanoid';
 
-export default function CreaterGroup() {
+export default function CreateGroup(props) {
+  const [groupName, setGroupName] = useState('')
+  const [userData, setUserData] = useState(props.route.params);
+  const groupsRef = firebase.firestore().collection('groups')
+  const usersRef = firebase.firestore().collection('users')
 
+  const navigator = useNavigation()
+  useEffect(() => {
+    // alert(userData.uid) 
+    // usersRef.doc(userData.uid).get().then(data => {
+    //   setUserData(userData)
+    //   alert("set")
+    // })
+    usersRef.doc(userData.uid).onSnapshot(dataSnapshot => {
+      setUserData(dataSnapshot.data())
+      // alert("set")
+
+    })
+    // .then(data => {
+    //   setUserData(userData)
+    //   alert("set")
+    // })
+  }, [])
+
+  const navHome = () => {
+    navigator.goBack();
+  }
+
+  const onCreatePress = (groupName) => {
+      // const uid = response.user.uid
+      const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+      const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      const nanoid = customAlphabet(alphabet, 8);
+      const groupCode = nanoid() //=> "5VTDOfg2"
+      
+      const doc = groupsRef.doc()
+      // alert(doc.id)
+      const data = {
+        createdAt: timestamp, 
+        createdBy: userData.uid, 
+        groupCode, 
+        id: doc.id, 
+        lastQuote: "", 
+        modifiedAt: timestamp, 
+        groupName, 
+        members: [userData.uid],
+        type: 1
+      };
+
+      doc.set(data)
+      .then(() => {
+        // alert(doc.id)
+        // TODO: update the groups the user belongs to
+        let groups = [...userData.groups];
+        groups.push(doc.id)
+        // alert(groups)
+        usersRef.doc(userData.uid)
+        .update({groups: groups})
+
+        navHome()
+      }).catch((error) => {
+        alert(error)
+      })
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,11 +89,11 @@ export default function CreaterGroup() {
                     placeholder='Group Name'
                     placeholderTextColor="#aaaaaa"
                     onChangeText={(text) => setGroupName(text)}
-                    value={email}
+                    value={groupName}
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                <TextInput
+                {/* <TextInput
                     style={styles.input}
                     placeholderTextColor="#aaaaaa"
                     secureTextEntry
@@ -37,18 +102,18 @@ export default function CreaterGroup() {
                     value={password}
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
-                />
+                /> */}
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => onLoginPress(email, password)}>
-                    <Text style={styles.buttonTitle}>Log in</Text>
+                    onPress={() => onCreatePress(groupName)}>
+                    <Text style={styles.buttonTitle}>Start Quoting</Text>
                 </TouchableOpacity>
-                <View style={styles.footerView}>
+                {/*<View style={styles.footerView}>
                     <Text style={styles.footerText}>Don't have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Sign up</Text></Text>
                 </View>
                 <View style={styles.footerView}>
                     <Text style={styles.footerText}><Text onPress={onForgotPasswordPress} style={styles.footerLink}>Forgot your password?</Text></Text>
-                </View>
+                </View> */}
             </ScrollView>
         </SafeAreaView>
   )

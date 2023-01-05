@@ -5,6 +5,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GroupButton from '../Components/GroupButton';
+// import { Modal } from 'react-native';
+import Modal from 'react-native-modal';
+import { assertionError } from '@firebase/util';
 export default function Home(props) {
     const [todos, setTodos] = useState([]);
     const [userData, setUserData] = useState(props.route.params.user);
@@ -15,14 +18,91 @@ export default function Home(props) {
     const navigation = useNavigation();
 
     const [groupData, setGroupData] = useState([])
+    const [modalGroupCode, setModalGroupCode] = useState('')
 
     const isFocused = useIsFocused();
+
+    const [isJoinModaVisible, setIsJoinModalVisible] = React.useState(false)
+
+    const [groupCodeError, setGroupCodeError] = useState('')
     // const test = props.test
 
     // useEffect(() =>
     // {
     //     setAddData(userData.fullName)
     // }, [todos])
+
+    const onJoinGroupPressed = () => {
+        groupRef.where('groupCode', '==', modalGroupCode)
+        .get()
+        .then((snapshot) => {
+            // console.log(snapshot.docs.length)    
+            if (snapshot.docs.length === 1)
+            {
+                // add user to group members list
+                let doc = snapshot.docs[0].data()
+                let id = doc.id
+                let members = [...doc.members] // copy of array
+                let isAlreadyPartOfGroup = false
+                console.log
+                if (members.includes(userData.uid))
+                {
+                    isAlreadyPartOfGroup = true
+                    console.log("ID is already in list")
+                }               
+
+                // add group to user groups list
+                let groups = [...userData.groups];
+                let isAlreadyInUser = false
+                if (groups.includes(doc.id))
+                {
+                    isAlreadyInUser = true
+                    console.log("group already in user groups")
+                }
+                
+                if (isAlreadyInUser && isAlreadyPartOfGroup)
+                {
+                    console.log("User already part of this group")
+                    setGroupCodeError("You are already part of this group")
+                }
+                else
+                {
+                    // push data to backend
+                    if (!isAlreadyPartOfGroup)
+                    {
+                        members.push(userData.uid)
+                        groupRef.doc(id).update({members: members})
+                    }
+                    
+                    if(!isAlreadyInUser)
+                    {
+                        groups.push(doc.id)
+                        usersRef.doc(userData.uid)
+                        .update({groups: groups})
+                    }
+                    alert("You joined a new group!")
+                    setGroupCodeError('')
+                    setIsJoinModalVisible(false)
+                    setData()
+                    // TODO: navigate to the group view
+                }
+                
+            }
+            else if (snapshot.docs.length < 1)
+            {
+                setGroupCodeError('That code is invalid. Try a different code.')
+            }
+            else
+            {
+                setGroupCodeError('Error. Please email an3developer@gmail.com with the group code you tried to use.')
+                // alert("Error. Please email an3developer@gmail.com with the group code you tried to use.")
+            }
+        }).catch((error) => {
+            setGroupCodeError(error.toString())
+            console.log("Catch group code set", error)
+        })
+    }
+
     //fetch or read data from firebase
     const fetchGroups = (userData) => {
         // console.log(userData)
@@ -67,7 +147,7 @@ export default function Home(props) {
     }
     
     useEffect(() => {
-        console.log("Use effect")
+        // console.log("Use effect")
         setData()
     }, [isFocused]);
 
@@ -86,54 +166,83 @@ export default function Home(props) {
   return (
     
     <View style={styles.entireContainer}>
-            
-            <FlatList 
-                ListHeaderComponent={
-                    <View style={styles.container}>
-                        <Text style={styles.titleText}>
-                            Friend Quotes
-                        </Text>
 
-                        <View style={styles.topRightButtons}>
-                            <TouchableOpacity onPress={ () => {
-                                onPlusPressed();
-                            }}>
-                                <FontAwesome name="plus-square-o"  style={styles.plus}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={ () => {
-                                onSettingsPressed();
-                            }}>
-                                <FontAwesome name='cog' color={'black'} style={styles.settingsCog}/>
-                            </TouchableOpacity>
-                        </View>
-                        
-                    
-                        {/* <TouchableOpacity style={styles.button} onPress={() => {
-                                addTodo()
-                            }
-                        } /> */}
-                    </View>
-                }
-                // styles={{backgroundColor: 'black'}}
-                data={groupData}
-                numColumns={1}
-                renderItem = { ({item}) => (
-                    <GroupButton key={item.id} 
-                        {...item} 
-                        onClick={() => onGroupButtonClicked(item.id)} />
-                ) 
-                }
-
-                ListFooterComponent={
-                    <TouchableOpacity style={styles.join} onPress={() => {}}>
-                        <View style={styles.header}>
-                            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.joinText}>Join new group?</Text>
-                            {/* <FontAwesome name='trash-o' color={'black'} style={styles.trash}/>               */}
-                        </View>
-                        {/* <Text>Members: {props.members.length}</Text> */}
+        <Modal isVisible={isJoinModaVisible} 
+            animationIn={'fadeInUp'} 
+            animationOut={'fadeOut'}
+            // animationOutTiming={2000}
+            avoidKeyboard={true}
+            onBackdropPress={() => setIsJoinModalVisible(false)}
+            backdropOpacity={0.5}
+            useNativeDriverForBackdrop={true} //makes animation smooth         
+            onBackButtonPress={() => setIsJoinModalVisible(false)}>
+            <View style={modalStyles.container}>
+                <View style={modalStyles.bg}>
+                    <Text style={modalStyles.title}>Join New Group</Text>
+                    <TextInput 
+                        style={modalStyles.textInput}
+                        placeholder='Enter group code'
+                        placeholderTextColor="#aaaaaa"
+                        onChangeText={(text) => setModalGroupCode(text)}
+                        value={modalGroupCode}
+                        underlineColorAndroid="transparent"
+                        autoCapitalize="none"
+                    />
+                    {groupCodeError != '' && <Text style={modalStyles.error}>{groupCodeError}</Text> }
+                    <TouchableOpacity style={modalStyles.button} onPress={() => onJoinGroupPressed()}>
+                        <Text style={modalStyles.buttonTitle}>Join Group</Text>    
                     </TouchableOpacity>
-                }
-            />
+                </View>
+            </View>
+        </Modal>
+
+        <FlatList 
+            ListHeaderComponent={
+                <View style={styles.container}>
+                    <Text style={styles.titleText}>
+                        Friend Quotes
+                    </Text>
+
+                    <View style={styles.topRightButtons}>
+                        <TouchableOpacity onPress={ () => {
+                            onPlusPressed();
+                        }}>
+                            <FontAwesome name="plus-square-o"  style={styles.plus}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={ () => {
+                            onSettingsPressed();
+                        }}>
+                            <FontAwesome name='cog' color={'black'} style={styles.settingsCog}/>
+                        </TouchableOpacity>
+                    </View>
+                    
+                
+                    {/* <TouchableOpacity style={styles.button} onPress={() => {
+                            addTodo()
+                        }
+                    } /> */}
+                </View>
+            }
+            // styles={{backgroundColor: 'black'}}
+            data={groupData}
+            numColumns={1}
+            renderItem = { ({item}) => (
+                <GroupButton key={item.id} 
+                    {...item} 
+                    onClick={() => onGroupButtonClicked(item.id)} />
+            )
+            }
+
+            ListFooterComponent={
+                <TouchableOpacity style={styles.join} onPress={() => {setIsJoinModalVisible(true)}}>
+                    <View style={styles.header}>
+                        <Text ellipsizeMode='tail' numberOfLines={1} style={styles.joinText}>Join new group?</Text>
+                        {/* <FontAwesome name='trash-o' color={'black'} style={styles.trash}/>               */}
+                    </View>
+                    {/* <Text>Members: {props.members.length}</Text> */}
+                </TouchableOpacity>
+            }
+        />
     </View>
   )
 }
@@ -162,8 +271,8 @@ const styles = StyleSheet.create({
     join: {
       backgroundColor: '#91a1e9',
 
-      marginLeft: 20,
-      marginRight: 20,
+      marginLeft: 8,
+      marginRight: 8,
     //   marginTop: 20,
       height: 48,
       borderRadius: 5,
@@ -171,7 +280,8 @@ const styles = StyleSheet.create({
       justifyContent: 'center'
     },
     joinText:{
-        fontSize: 16
+        fontSize: 16,
+        color: 'white',
     },
     topRightButtons: {
         flexDirection: 'row',
@@ -181,6 +291,7 @@ const styles = StyleSheet.create({
     },
     titleText:{
         fontSize: 30,
+        color:'black'
     },
     plus:
     {
@@ -220,5 +331,54 @@ const styles = StyleSheet.create({
     itemText:{
         fontSize: 100,
         // paddingHorizontal: 10
+    }
+})
+
+const modalStyles = StyleSheet.create({
+    container: {
+        justifyContent: 'center',
+        alignItems: 'stretch',    
+    },
+    bg: {
+        backgroundColor: '#e6e6e6ff',       
+        padding: 20,
+        borderRadius: 5,
+        alignItems: 'stretch',
+        justifyContent: 'center'
+    },
+    title: {
+        marginBottom: 10,
+        fontSize: 25,
+        textAlign: 'center'
+    },
+    textInput: {
+        height: 48,
+        borderRadius: 5,
+        overflow: 'hidden',
+        backgroundColor: 'white',
+        marginTop: 10,
+        marginBottom: 5,
+        marginLeft: 30,
+        marginRight: 30,
+        paddingLeft: 16
+    },
+    button:{
+        backgroundColor: "#788eec",
+        alignItems: 'center',
+        marginHorizontal: 80,
+        // marginTop: 5,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 10
+    },
+    buttonTitle:
+    {
+        fontSize: 20,
+        color: 'white'
+    },
+    error: {
+        color: "#f32714",
+        textAlign: 'center',
+
     }
 })

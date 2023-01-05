@@ -10,9 +10,9 @@ export default function GroupButton(props) {
         <TouchableOpacity style={styles.container} onPress={() => props.onClick()}>
             <View style={styles.header}>
                 <Text ellipsizeMode='tail' numberOfLines={1} style={styles.title}>{props.groupName}</Text>
-                <FontAwesome name='trash-o' color={'black'} style={styles.trash}/>              
+                <FontAwesome name='trash-o' color={'white'} style={styles.trash}/>              
             </View>
-            <Text>Members: {props.members.length}</Text>
+            <Text style={styles.members}>Members: {props.members.length}</Text>
         </TouchableOpacity>
         
         
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         height: 120,
         backgroundColor: "#7da6ff", 
         padding: 10,
-        marginHorizontal: 20,
+        marginHorizontal: 8,
         marginBottom: 10,
         borderRadius: 10,
         // justifyContent: 'flex-start',
@@ -45,6 +45,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         alignSelf: 'stretch',
         maxWidth: 300,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: 'white'
+    },
+    members: {
+        color: 'white'
     }
 })

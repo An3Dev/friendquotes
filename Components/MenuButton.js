@@ -3,7 +3,7 @@ import React from 'react'
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { Entypo } from '@expo/vector-icons';
 
-const MenuButton = () => {
+const MenuButton = (props) => {
   return (
     <View style={styles.container}>
         <Menu style={styles.menu}>
@@ -20,8 +20,8 @@ const MenuButton = () => {
                 <Entypo name="dots-three-vertical" size={20} color="black"/>
             </MenuTrigger>
             <MenuOptions>
-                <MenuOption style={styles.menuOption} onSelect={() => onSharePress()} text="Share" />
-                <MenuOption style={styles.menuOption} onSelect={() => onClickCopy()} text="Copy Group Code" />
+                <MenuOption style={styles.menuOption} onSelect={() => props.onGroupSettingsButtonClicked()} text="Group Settings" />
+                {/* <MenuOption style={styles.menuOption} onSelect={() => onClickCopy()} text="Copy Group Code" /> */}
                 
                 {/* <MenuOption onSelect={() => alert(`Delete`)} text="Delete" /> */}
             </MenuOptions>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         paddingRight: 0
     },
     menuOption: {
-        // padding: 10
+        padding: 10
     },
 })
 export default MenuButton

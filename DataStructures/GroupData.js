@@ -8,6 +8,6 @@ export default function GroupData() {
     modifiedAt, 
     groupName, 
     members,
-    type
+    type,
   })
 }

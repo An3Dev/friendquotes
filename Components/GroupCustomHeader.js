@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import { Menu, MenuTrigger, MenuOptions, MenuOption } from 'react-native-popup-menu';
+import { Entypo } from '@expo/vector-icons';
 
 const GroupCustomHeader = (props) => {
   return (
@@ -11,26 +13,11 @@ const GroupCustomHeader = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        //  backgroundColor: 'black'
+        flexDirection: 'row'
     },
     title: {
         fontSize: 25
-    },
-    menu: {
-        position: 'absolute',
-        right: 0,
-        // marginTop: 8,
-        // padding: 40,
-
-        paddingTop: 0,
-        paddingRight: 0
-    },
-    menuOption: {
-        // padding: 10
-    },
+    }
 })
 
 export default GroupCustomHeader

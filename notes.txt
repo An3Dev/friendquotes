@@ -1,0 +1,8 @@
+
+- make the flat list keep same position when keyboard pops up
+- center the add group button when the user doesn't belong to any groups 
+- add onboarding
+- fix text moving buttons
+    - solution: flexShrink 1 on text input
+- fix the flex box not working
+    - Solution: Set the parent container to flex: 1

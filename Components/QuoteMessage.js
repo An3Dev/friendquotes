@@ -7,6 +7,7 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
     const [downloadImageUrl, setDownloadImageUrl] = useState()
     // const pathRef = ref(storage, `/${imageUrl}`)
     useEffect(() =>{
+        console.log(quote)
         // console.log(userData.uid === sentBy ? 1 : 2)
         if (imageUrl != undefined && imageUrl != '')
         {
@@ -39,7 +40,7 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
         )
     }
 
-    const otherMessage = () => {
+    const otherUserMessage = () => {
         return(
             <View style={{flex: 1}}>
                 <Text style={styles.sentByName}>{sentByName}</Text>
@@ -48,7 +49,7 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
                         { downloadImageUrl != '' && <Image source={{uri: downloadImageUrl}} 
                             style={styles.image}
                             resizeMode={'contain'}/> }
-                        <Text style={styles.messageText}>
+                        <Text style={styles.otherMessageText}>
                             { quote }
                         </Text>
                     </Pressable>         
@@ -56,11 +57,12 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
             </View>)
         
     }
+    
 
     return (
-        <View>
-            { type == 1 &&
-                <View style={styles.container}>
+        <View style={{flex: 1}}>
+            { type === 1 &&
+                (<View style={styles.container}>
                     <Text style={styles.sentByName}>{sentByName}</Text>
                     
                     <Pressable style={styles.quote}>
@@ -68,13 +70,17 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
                             style={styles.image}
                             resizeMode={'contain'}/> }
                         <Text style={styles.quoteText}>
-                        { saidBy ? `"${quote}" - ${saidBy}` : `"${quote}" - Anonymous` }
+                        { `"${quote}"` }
+                            <Text style={styles.authorText}>
+                            { saidBy != '' ? `-${saidBy}` : '\n-Anonymous' }
+                            </Text>
                         </Text>
+                        
                     </Pressable>         
-                </View>
+                </View>)
             }
             {
-                type == 2 && (userData.uid === sentBy ? ownMessage() : otherMessage())
+                type == 2 && (userData.uid === sentBy ? ownMessage() : otherUserMessage())
             }
         </View>
     )
@@ -85,7 +91,10 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
 export default QuoteMessage
 
 const styles = StyleSheet.create({
-    container: { flex: 1, flexDirection: 'column'
+    container: { 
+        flex: 1, 
+        flexDirection: 'column',
+        // backgroundColor: 'black'
     },
     messageContainer: {
         flex: 1, 
@@ -115,13 +124,18 @@ const styles = StyleSheet.create({
     quoteText:{
         fontSize: 20,
     },
+    authorText: {
+        fontSize: 15,
+        alignSelf: 'flex-start'
+    },
     message: {
-        backgroundColor: '#efb9b9',
+        backgroundColor: '#4b8bfa',
         padding: 10,
         marginRight: 10,
         borderRadius: 20,
         maxWidth: 300,
         alignItems: 'flex-start',
+        marginBottom: 10
     },
     otherMessage: {
         backgroundColor: '#cccccc',
@@ -131,10 +145,18 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         flexDirection: 'column',
         maxWidth: 300,
+        marginBottom: 10
+        
     },
     messageText: {
         textAlign: 'left',
         fontSize: 20,
+        color: '#fff'
+    },
+    otherMessageText: {
+        textAlign: 'left',
+        fontSize: 20,
+        color: '#000'
     },
     image: {
         width: 200,

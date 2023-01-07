@@ -20,6 +20,9 @@ export default function GroupView(props) {
     const [messagesData, setMessagesData] = useState([]);
     const flatListRef = useRef(null);
 
+    const [topMessage, setTopMessage] = useState('')
+    const [bottomMessage, setBottomMessage] = useState('')
+
     const groupRef = firebase.firestore().collection('groups');
     const messagesRef = firebase.firestore().collection('message').doc(groupData.id).collection('messages')
     // const [addData, setAddData] = useState('');
@@ -27,19 +30,22 @@ export default function GroupView(props) {
 
     const [isRefreshingList, setIsRefreshingList] = useState(false)
 
-    const getMessages = (snapshot) => {
+    const getMostRecentMessages = (snapshot) => {
         // let data = [...messagesData]
         let data = []
         snapshot.docs.forEach(doc => {
             data.push(doc.data())
         })
+        data.reverse()
+        setTopMessage(data[0].id)
+        setBottomMessage(data[data.length - 1].id)
         setMessagesData(data)
-        console.log(data) 
     }
 
   useEffect(() => {
-    messagesRef.orderBy('sentAt').limit(10).onSnapshot(snapshot => {  
-        getMessages(snapshot)   
+    messagesRef.orderBy('sentAt', 'desc').limit(20).onSnapshot(snapshot => {  
+
+        getMostRecentMessages(snapshot)
     })
     navigation.setOptions({
         headerTitle: 
@@ -47,8 +53,13 @@ export default function GroupView(props) {
                 {...groupData} 
                 isHeader={true}>{groupData.groupName}</GroupCustomHeader>,
         headerRight: 
-            () => <GroupCustomHeaderButtons {...groupData} onGroupSettingsButtonClicked={() => onGroupSettingsButtonClicked()}></GroupCustomHeaderButtons>
+            () => <GroupCustomHeaderButtons 
+                {...groupData} 
+                onGroupSettingsButtonClicked={() => onGroupSettingsButtonClicked()}
+                onClickFilter />
         })
+
+        flatListRef.current.scrollToEnd()
   }, [])  
 
 
@@ -58,15 +69,26 @@ export default function GroupView(props) {
     alert("Group settings button clicked")
   }
 
-  const onSendButtonClicked = (message) => 
+  const onSendButtonClicked = (message, result) => 
   {
     if (message.length > 0)
     {
-        sendFirebaseMessage({message, userData, groupData})
+        const promise = new Promise((resolve, reject) => sendFirebaseMessage({message, userData, groupData}, resolve, reject))
+        .then((didSucceed) => 
+        {
+            console.log("Did succeed(group view)", didSucceed)
+            result(didSucceed)
+        }).catch((error) => {
+            console.log("Catch", error)
+        })
     }
 
     // console.log(flatListRef.current)
-    // flatListRef.current.scrollToEnd()   
+    flatListRef.current.scrollToEnd()   
+  }
+
+  const onQuoteButtonClicked = () => {
+    navigation.navigate('CreateQuote', {userData, groupData} )
   }
 
   const onScroll = (event) => {
@@ -76,6 +98,10 @@ export default function GroupView(props) {
         console.log("Reached top")
         setIsRefreshingList(true)
         // load 10 older messages
+    }
+    if (isRefreshingList && scrollOffset > 100)
+    {
+        setIsRefreshingList(false)
     }
     // console.log(scrollOffset)
     // flatListRef.current?.scrollToEnd()
@@ -101,18 +127,6 @@ export default function GroupView(props) {
                 // inverted={true}
                 onScroll={(event) => onScroll(event)}
                 data={messagesData}
-                // data={[{id: 'a', groupName: 'a'}, 
-                // {id: 'b', groupName: 'b'}, 
-                // {id: 'c', groupName: 'c'},
-                // {id: 'd', groupName: 'd'}, 
-                // {id: 'e', groupName: 'e'}, 
-                // {id: 'f', groupName: 'f'},
-                // {id: 'g', groupName: 'g'}, 
-                // {id: 'h', groupName: 'h'}, 
-                // {id: 'i', groupName: 'i'},
-                // {id: 'j', groupName: 'j'}, 
-                // {id: 'k', groupName: 'k'}, 
-                // {id: 'l', groupName: 'l'}]}
                 refreshing={isRefreshingList}
                 style={styles.flatList}
                 contentContainerStyle={{marginVertical: 10}}
@@ -125,7 +139,9 @@ export default function GroupView(props) {
                  
             {/* <Text>Ttest</Text> */}
         {/* <View style={styles.keyboardAvoidingView}> */}
-            <MessageInputBox onSendButtonClicked={(message) => onSendButtonClicked(message)} />
+            <MessageInputBox 
+                onSendButtonClicked={(message, result) => onSendButtonClicked(message, result)}
+                onQuoteButtonClicked={() => onQuoteButtonClicked()} />
         {/* </View> */}
     </View>
   )

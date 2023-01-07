@@ -46,11 +46,9 @@ export default function Home(props) {
                 let id = doc.id
                 let members = [...doc.members] // copy of array
                 let isAlreadyPartOfGroup = false
-                console.log
                 if (members.includes(userData.uid))
                 {
                     isAlreadyPartOfGroup = true
-                    console.log("ID is already in list")
                 }               
 
                 // add group to user groups list
@@ -58,13 +56,10 @@ export default function Home(props) {
                 let isAlreadyInUser = false
                 if (groups.includes(doc.id))
                 {
-                    isAlreadyInUser = true
-                    console.log("group already in user groups")
-                }
+                    isAlreadyInUser = true                }
                 
                 if (isAlreadyInUser && isAlreadyPartOfGroup)
                 {
-                    console.log("User already part of this group")
                     setGroupCodeError("You are already part of this group")
                 }
                 else
@@ -101,7 +96,6 @@ export default function Home(props) {
             }
         }).catch((error) => {
             setGroupCodeError(error.toString())
-            console.log("Catch group code set", error)
         })
     }
 

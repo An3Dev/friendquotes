@@ -11,6 +11,7 @@ import Settings from './Screens/Settings';
 import CreateGroup from './Screens/CreateGroup';
 import { MenuProvider } from 'react-native-popup-menu';
 import GroupView from './Screens/GroupView';
+import CreateQuote from './Screens/CreateQuote';
 
 const Stack = createStackNavigator();
 
@@ -43,6 +44,11 @@ export default function App() {
                 name='GroupView'
                 options={{headerShown: true}}       
                 component={GroupView}
+              />
+              <Stack.Screen 
+                name='CreateQuote'
+                options={{headerShown: true}}       
+                component={CreateQuote}
               />
               <Stack.Screen 
                 name='CreateGroup'

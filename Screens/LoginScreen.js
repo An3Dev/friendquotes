@@ -16,7 +16,6 @@ export default function LoginScreen(props) {
     const getLogin = async () => {
         try {
             const jsonValue = await AsyncStorage.getItem('@loginInfo')
-            console.log(jsonValue)
             return jsonValue != null ? JSON.parse(jsonValue) : null;
         } catch(e) {
           // error reading value
@@ -25,7 +24,6 @@ export default function LoginScreen(props) {
       }
 
     const storeLogin = async (email, password) => {
-        console.log("Store login")
         try {
             const value = {email: email, password: password};
             const jsonValue = JSON.stringify(value)
@@ -40,13 +38,12 @@ export default function LoginScreen(props) {
             {
                 if (data !== "{}" && data.email.length > 0 && data.password.length > 0)
                 {
-                    console.log(data)
                     
                     onLoginPress(data.email, data.password)
                 }
                 else
                 {
-                    console.log("No info")
+                    // console.log("No info")
                 }
             }).catch((error) => {
                 console.log(error)

@@ -190,7 +190,7 @@ export default function Home(props) {
     const onGroupButtonClicked = (data) => {
         // alert(id)
         // console.log("Group with id", id, "was clicked")
-        navigation.navigate('GroupView', {groupData: data})
+        navigation.navigate('GroupView', {groupData: data, userData: userData})
     }
 
   return (

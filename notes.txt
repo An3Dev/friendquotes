@@ -6,3 +6,8 @@
     - solution: flexShrink 1 on text input
 - fix the flex box not working
     - Solution: Set the parent container to flex: 1
+
+-add reaction
+
+-best quote of the week
+- quote view, and all messages view

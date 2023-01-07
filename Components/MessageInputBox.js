@@ -3,7 +3,7 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-const MessageInputBox = () => {
+const MessageInputBox = (props) => {
   const [message, setMessage] = useState('')
   return (
     <View style={styles.container}>   
@@ -19,11 +19,10 @@ const MessageInputBox = () => {
             multiline={true}
             numberOfLines={2}
         />
-      
 
         <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.sendButton}>
-                <Text style={{color: 'white'}}>Send</Text>
+            <TouchableOpacity style={styles.sendButton} onPress={() => props.onSendButtonClicked()}>
+                <Text style={styles.sendText}>Send</Text>
             </TouchableOpacity>
         </View>
         
@@ -56,11 +55,15 @@ const styles = StyleSheet.create({
         marginRight: 10
     },
     sendButton: {
-        backgroundColor: '#546ee3',
+        // backgroundColor: 'black',
         justifyContent: 'center',
         borderRadius: 10,
-        paddingHorizontal: 20,
+        paddingLeft: 10,
         marginVertical: 2
+    },
+    sendText: {
+        color: '#546ee3',
+         fontSize: 17
     }
     
 })

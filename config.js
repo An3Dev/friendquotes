@@ -1,7 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-
+import { getStorage } from "firebase/storage";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -20,12 +20,15 @@ const firebaseConfig = {
   measurementId: "G-XKD6Y2ZYFP"
 };
 
+let app;
 // if this firebase project has initialized apps
 if (!firebase.apps.length)
 {
-    firebase.initializeApp(firebaseConfig)
+    app = firebase.initializeApp(firebaseConfig)
 }
-export { firebase };
+const storage = getStorage(app);
+
+export { firebase, storage };
 // // Initialize Firebase
 // const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);

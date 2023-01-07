@@ -7,7 +7,6 @@ import { firebase } from '../config'
 import { useNavigation, StackActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onLog } from 'firebase/app';
-import QuoteData from '../DataStructures/QuoteData';
 
 export default function LoginScreen(props) {
     const [email, setEmail] = useState('')

@@ -11,6 +11,7 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import MessageInputBox from '../Components/MessageInputBox';
 import QuoteMessage from '../Components/QuoteMessage';
+import { sendFirebaseMessage } from '../Components/SendFirebaseMessage';
 // import KeyboardSpacer from 'react-native-keyboard-spacer';
 // import { KeyboardAvoidingView } from 'react-native';
 export default function GroupView(props) {
@@ -25,7 +26,6 @@ export default function GroupView(props) {
     const navigation = useNavigation();
 
     const [isRefreshingList, setIsRefreshingList] = useState(false)
-    
 
     const getMessages = (snapshot) => {
         // let data = [...messagesData]
@@ -36,8 +36,6 @@ export default function GroupView(props) {
         setMessagesData(data)
         console.log(data) 
     }
-
-    const sendMessage = 
 
   useEffect(() => {
     messagesRef.orderBy('sentAt').limit(10).onSnapshot(snapshot => {  
@@ -60,15 +58,15 @@ export default function GroupView(props) {
     alert("Group settings button clicked")
   }
 
-  const onTextChange = () => 
+  const onSendButtonClicked = (message) => 
   {
-    
-  }
+    if (message.length > 0)
+    {
+        sendFirebaseMessage({message, userData, groupData})
+    }
 
-  const onSendButtonClicked = () => 
-  {
-    console.log(flatListRef.current)
-    flatListRef.current.scrollToEnd()   
+    // console.log(flatListRef.current)
+    // flatListRef.current.scrollToEnd()   
   }
 
   const onScroll = (event) => {
@@ -117,7 +115,7 @@ export default function GroupView(props) {
                 // {id: 'l', groupName: 'l'}]}
                 refreshing={isRefreshingList}
                 style={styles.flatList}
-                contentContainerStyle={{marginTop: 10}}
+                contentContainerStyle={{marginVertical: 10}}
                 numColumns={1}                
                 renderItem = { ({item}) => (
                     <QuoteMessage key={item.id} {...item} userData={userData}/>
@@ -127,7 +125,7 @@ export default function GroupView(props) {
                  
             {/* <Text>Ttest</Text> */}
         {/* <View style={styles.keyboardAvoidingView}> */}
-            <MessageInputBox onSendButtonClicked={() => onSendButtonClicked()} />
+            <MessageInputBox onSendButtonClicked={(message) => onSendButtonClicked(message)} />
         {/* </View> */}
     </View>
   )

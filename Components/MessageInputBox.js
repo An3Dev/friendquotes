@@ -21,8 +21,8 @@ const MessageInputBox = (props) => {
         />
 
         <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.sendButton} onPress={() => props.onSendButtonClicked()}>
-                <Text style={styles.sendText}>Send</Text>
+            <TouchableOpacity style={styles.sendButton} onPress={() => message.length > 0 && props.onSendButtonClicked(message)}>
+                <Text style={message.length > 0 ? styles.sendText : styles.sendTextNoInput}>Send</Text>
             </TouchableOpacity>
         </View>
         
@@ -63,7 +63,11 @@ const styles = StyleSheet.create({
     },
     sendText: {
         color: '#546ee3',
-         fontSize: 17
+        fontSize: 17
+    },
+    sendTextNoInput: {
+        color: '#acb4d7',
+        fontSize: 17
     }
     
 })

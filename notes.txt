@@ -19,4 +19,9 @@ Things I've learned:
     give it flex: 1, and give the send button flex: 0 so that the input box
     gets all the priority
 
-- always set container views to have flex: 1 so that they fill the entire space
+- always set views with no siblings to have flex: 1 if you want them to expand to the entire space
+
+-  if a view is expanding vertically and you 
+    don't want that, set its parent to row flex flexDirection
+    and alignItems to flex-start
+

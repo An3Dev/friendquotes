@@ -11,7 +11,7 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import MessageInputBox from '../Components/MessageInputBox';
 import QuoteMessage from '../Components/QuoteMessage';
-import { sendFirebaseMessage } from '../Components/SendFirebaseMessage';
+import { sendFirebaseQuote } from '../Components/SendFirebaseQuote';
 import CustomHeader from '../Components/CustomHeader';
 import LabelToggleTextInput from '../Components/LabelToggleTextInput';
 const CreateQuote = (props) => {
@@ -74,6 +74,18 @@ const CreateQuote = (props) => {
         setData(newData)
       }, [quote, saidBy, dateSaid, enableSaidBy] )
 
+
+    const onSendQuotePressed = () => {
+        const promise = new Promise((resolve, reject) => sendFirebaseQuote({data, userData, groupData}, resolve, reject))
+        .then((didSucceed) => 
+        {
+            console.log("Did succeed(create quote)", didSucceed)
+            
+        }).catch((error) => {
+            console.log("Catch", error)
+        })
+    }
+    
   return (
     <View style={styles.container}>
         <Text style={styles.previewText}>Preview:</Text>
@@ -105,7 +117,7 @@ const CreateQuote = (props) => {
             autoCapitalize="true"
         />
 
-        <LabelToggleTextInput
+        {/* <LabelToggleTextInput
             onCheckStateChange={(checked) => setEnableSaidBy(checked)}
             label={'Date said:'}
             onChangeText={(text) => setSaidBy(text)}   
@@ -125,7 +137,13 @@ const CreateQuote = (props) => {
             value={saidBy}
             underlineColorAndroid="transparent"
             autoCapitalize="true"
-        />
+        /> */}
+
+        <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => onSendQuotePressed()}>
+                    <Text style={styles.buttonText}>Send Quote</Text>
+                </TouchableOpacity>
             {/* <TextInput
                 style={styles.input}
                 placeholder='E-mail'
@@ -178,4 +196,18 @@ const styles = StyleSheet.create({
         marginRight: 30,
         paddingLeft: 16
     },
+    button: {
+        backgroundColor: '#788eec',
+        marginLeft: 30,
+        marginRight: 30,
+        marginTop: 20,
+        height: 48,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: 'center'
+    },
+    buttonText: {
+        fontSize: 20,
+        color: 'white'
+    }
 })

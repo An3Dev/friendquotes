@@ -21,7 +21,7 @@ const LabelToggleTextInput = (props) => {
     
             <Text style={isChecked ? styles.label : styles.labelDisabled}>{props.label}</Text>
 
-            {(isChecked || props.disableToggle) && <TextInput style={styles.input} {...props}/>}
+            {(isChecked || props.disableToggle) && <TextInput style={styles.input} {...props} />}
     </View>
   )
 }

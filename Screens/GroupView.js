@@ -37,8 +37,12 @@ export default function GroupView(props) {
             data.push(doc.data())
         })
         data.reverse()
-        setTopMessage(data[0].id)
-        setBottomMessage(data[data.length - 1].id)
+        if (data.length > 0)
+        {
+            setTopMessage(data[0].id)
+            setBottomMessage(data[data.length - 1].id)
+        }
+        
         setMessagesData(data)
     }
 

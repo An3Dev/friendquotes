@@ -66,8 +66,6 @@ const CreateQuote = (props) => {
             imageUrl: '', 
             quote: tempQuote, 
             saidBy: saidByTemp, 
-            sentBy: userData.uid, 
-            sentByName: userData.displayName, 
             type: 1
         }
         console.log("New data:", newData)
@@ -80,6 +78,9 @@ const CreateQuote = (props) => {
         .then((didSucceed) => 
         {
             console.log("Did succeed(create quote)", didSucceed)
+            if (didSucceed) {
+                navigation.goBack()
+            }
             
         }).catch((error) => {
             console.log("Catch", error)

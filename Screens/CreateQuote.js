@@ -56,8 +56,9 @@ const CreateQuote = (props) => {
             tempQuote = 'An exceptional quote.'
         }
         
-        var saidByTemp = enableSaidBy == true ? saidBy : '';
-        if (enableSaidBy && saidBy === '')
+        let saidByTemp = ''
+        saidByTemp = enableSaidBy == true ? saidBy : '';
+        if (enableSaidBy == true && saidBy === '')
         {
             saidByTemp = 'Anonymous'
         }
@@ -77,7 +78,7 @@ const CreateQuote = (props) => {
     <View style={styles.container}>
         <Text style={styles.previewText}>Preview:</Text>
         <View style={styles.previewContainer}>
-            <QuoteMessage {...data} userData />
+            <QuoteMessage {...data} userData={userData} />
         </View>
 
 
@@ -96,7 +97,29 @@ const CreateQuote = (props) => {
         <LabelToggleTextInput
             onCheckStateChange={(checked) => setEnableSaidBy(checked)}
             label={'Said by:'}
-            onChangeText={(text) => setSaidBy(text)}          
+            onChangeText={(text) => setSaidBy(text)}   
+            placeholder='Anonymous'
+            placeholderTextColor="#aaaaaa"
+            value={saidBy}
+            underlineColorAndroid="transparent"
+            autoCapitalize="true"
+        />
+
+        <LabelToggleTextInput
+            onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+            label={'Date said:'}
+            onChangeText={(text) => setSaidBy(text)}   
+            placeholder='Anonymous'
+            placeholderTextColor="#aaaaaa"
+            value={saidBy}
+            underlineColorAndroid="transparent"
+            autoCapitalize="true"
+        />
+
+        <LabelToggleTextInput
+            onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+            label={'Upload image'}
+            onChangeText={(text) => setSaidBy(text)}   
             placeholder='Anonymous'
             placeholderTextColor="#aaaaaa"
             value={saidBy}

@@ -16,7 +16,7 @@ const LabelToggleTextInput = (props) => {
             innerIconStyle={{borderRadius: 7} }
             disableBuiltInState
             isChecked={isChecked}
-            onPress={() => { setIsChecked(!isChecked), props.onCheckStateChange(isChecked) }}  />
+            onPress={() => { setIsChecked(!isChecked), props.onCheckStateChange(!isChecked) }}  />
       }
     
             <Text style={isChecked ? styles.label : styles.labelDisabled}>{props.label}</Text>

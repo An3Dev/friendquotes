@@ -11,7 +11,7 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
         {
             type = 2
         }
-        console.log("Quote:", saidBy)
+        // console.log("Quote:", sentBy, userData.uid)
         // console.log(quote)
         // console.log(userData.uid === sentBy ? 1 : 2)
         if (imageUrl != undefined && imageUrl != '')
@@ -68,14 +68,14 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
         <View style={{flex: 1}}>
             { type === 1 &&
                 (<View style={styles.container}>
-                    <Text style={styles.sentByName}>{sentByName}</Text>
+                    {userData.uid !== sentBy && <Text style={styles.sentByName}>{sentByName}</Text>}
                     
                     <Pressable style={styles.quote}>
                         { downloadImageUrl != '' && <Image source={{uri: downloadImageUrl}} 
                             style={styles.image}
                             resizeMode={'contain'}/> }
                         <Text style={styles.quoteText}>
-                        { `"${quote}"` }
+                        { `"${quote}" ` }
                         
                             {saidBy != '' && 
                                 <Text style={styles.authorText}>

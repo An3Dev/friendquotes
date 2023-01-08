@@ -11,9 +11,12 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import MessageInputBox from '../Components/MessageInputBox';
 import QuoteMessage from '../Components/QuoteMessage';
-import { sendFirebaseQuote } from '../Components/SendFirebaseQuote';
+import { sendFirebaseQuote } from '../Utilities/SendFirebaseQuote';
 import CustomHeader from '../Components/CustomHeader';
 import LabelToggleTextInput from '../Components/LabelToggleTextInput';
+import * as ImagePicker from 'expo-image-picker';
+
+import { takeOrPickImage } from '../Utilities/ImageTakerAndPicker';
 const CreateQuote = (props) => {
     const [userData] = useState(props.route.params.userData)
     const [groupData] = useState(props.route.params.groupData);
@@ -23,9 +26,12 @@ const CreateQuote = (props) => {
     const [dateSaid, setDateSaid] = useState('')
 
     const [enableSaidBy, setEnableSaidBy] = useState(true)
+    const [enableImage, setEnableImage] = useState(true)
 
     const[data, setData] = useState({quote, saidBy, dateSaid, type: 2})
+    const [image, setImage] = useState(null)
 
+    const [status, requestPermission] = ImagePicker.useCameraPermissions();
     // let data = 
     //     {   imageUrl: '', 
     //         quote:'The most exceptional quote.', 
@@ -50,6 +56,7 @@ const CreateQuote = (props) => {
       }, [])  
 
       useEffect(() => {
+        // console.log("Test")
         var tempQuote = quote
         if (quote == '')
         {
@@ -62,15 +69,20 @@ const CreateQuote = (props) => {
         {
             saidByTemp = 'Anonymous'
         }
+
+        let imageTemp = ''
+        imageTemp = enableImage == true ? image : '';
+        // console.log("Image temp:", imageTemp)
         const newData = {
             imageUrl: '', 
+            localImageUrl: imageTemp,
             quote: tempQuote, 
             saidBy: saidByTemp, 
             type: 1
         }
         console.log("New data:", newData)
         setData(newData)
-      }, [quote, saidBy, dateSaid, enableSaidBy] )
+      }, [quote, saidBy, dateSaid, image, enableSaidBy, enableImage] )
 
 
     const onSendQuotePressed = () => {
@@ -80,12 +92,61 @@ const CreateQuote = (props) => {
             console.log("Did succeed(create quote)", didSucceed)
             if (didSucceed) {
                 navigation.goBack()
-            }
-            
+            }          
         }).catch((error) => {
             console.log("Catch", error)
         })
     }
+
+    const onPressImageButton = () => {
+        
+        const promise = new Promise((resolve) => takeOrPickImage({shouldTake: false, requestPermission: requestPermission}, resolve)).then((result) => {
+            // console.log("Result from button press:", result)
+            // alert(result)
+            // result is an object with fileName, uri, fileSize, width, height, type
+            setImage(result.uri)
+        }).catch((error) => {
+            console.log(error)
+        })
+        // pickImage()
+    }
+
+    // const pickImage = async () => {
+    //     // No permissions request is necessary for launching the image library
+    //     requestPermission().then((data) => {
+
+    //         // alert(data.granted.valueOf())
+    //         // if (status.status.substring(0, 6) == 'denied')
+    //         // {
+
+    //         // }
+    //         if (data.granted.valueOf() == false)
+    //         {
+    //             alert("Camera permission denied")
+    //             return
+    //         }
+    //         ImagePicker.launchCameraAsync({
+    //             mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //             allowsMultipleSelection: false,
+    //             allowsEditing: true,
+    //             aspect: [4, 3],
+    //             quality: 1,
+    //         })
+    //         let result = ImagePicker.launchImageLibraryAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            
+    //         allowsEditing: true,
+    //         aspect: [4, 3],
+    //         quality: 1,
+    //         });
+        
+    //         console.log(result);
+        
+    //         if (!result.canceled) {
+    //         setImage(result.assets[0].uri);
+    //         }
+    //         })        
+    //   };
     
   return (
     <View style={styles.container}>
@@ -118,6 +179,8 @@ const CreateQuote = (props) => {
             autoCapitalize="true"
         />
 
+
+
         {/* <LabelToggleTextInput
             onCheckStateChange={(checked) => setEnableSaidBy(checked)}
             label={'Date said:'}
@@ -139,6 +202,13 @@ const CreateQuote = (props) => {
             underlineColorAndroid="transparent"
             autoCapitalize="true"
         /> */}
+
+                <TouchableOpacity
+                    style={styles.imageButton}
+                    onPress={() => onPressImageButton()}>
+                    <Text style={styles.buttonText}>Add Image</Text>
+                </TouchableOpacity>
+
 
         <TouchableOpacity
                     style={styles.button}
@@ -210,5 +280,19 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 20,
         color: 'white'
+    },
+    imageButton: {
+        backgroundColor: '#788eec',
+        marginLeft: 30,
+        marginRight: 30,
+        marginTop: 5,
+        // height: 48,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: 'center',
+        paddingVertical: 5
+    },
+    imageButtonText: {
+        fontSize: 15,
     }
 })

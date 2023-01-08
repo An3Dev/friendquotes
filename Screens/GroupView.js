@@ -11,7 +11,7 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import MessageInputBox from '../Components/MessageInputBox';
 import QuoteMessage from '../Components/QuoteMessage';
-import { sendFirebaseMessage } from '../Components/SendFirebaseMessage';
+import { sendFirebaseMessage } from '../Utilities/SendFirebaseMessage';
 // import KeyboardSpacer from 'react-native-keyboard-spacer';
 // import { KeyboardAvoidingView } from 'react-native';
 export default function GroupView(props) {

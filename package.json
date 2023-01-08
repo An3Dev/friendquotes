@@ -29,7 +29,8 @@
     "react-native-popup-menu": "^0.16.1",
     "react-native-safe-area-context": "^4.4.1",
     "react-native-share": "^8.1.0",
-    "shortid": "^2.2.16"
+    "shortid": "^2.2.16",
+    "expo-image-picker": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

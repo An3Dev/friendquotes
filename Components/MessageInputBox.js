@@ -10,7 +10,7 @@ import GroupCustomHeaderButtons from '../Components/GroupCustomHeaderButtons';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import QuoteMessage from '../Components/QuoteMessage';
-import { sendFirebaseMessage } from '../Components/SendFirebaseMessage';
+import { sendFirebaseMessage } from '../Utilities/SendFirebaseMessage';
 const MessageInputBox = (props) => {
   const [message, setMessage] = useState('')
 

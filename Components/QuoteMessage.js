@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { storage } from '../config';
 import { getDownloadURL, ref } from 'firebase/storage';
 
-const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, sentBy, sentByName, type, userData}) => {
-    const [downloadImageUrl, setDownloadImageUrl] = useState()
+const QuoteMessage = ({dateSaid, description, localImageUrl, imageUrl, quote, saidBy, sentAt, sentBy, sentByName, type, userData}) => {
+    const [downloadImageUrl, setDownloadImageUrl] = useState('')
     // const pathRef = ref(storage, `/${imageUrl}`)
     useEffect(() =>{
+        console.log("Test")
         if (type === undefined)
         {
             type = 2
@@ -16,18 +17,24 @@ const QuoteMessage = ({dateSaid, description, imageUrl, quote, saidBy, sentAt, s
         // console.log(userData.uid === sentBy ? 1 : 2)
         if (imageUrl != undefined && imageUrl != '')
         {
+            console.log("image url", imageUrl)
             getDownloadURL(ref(storage, imageUrl)).then((url) => {
                 setDownloadImageUrl(url)
             }).catch((error) => {
                 alert(error)
             })
         }
+        else if (localImageUrl != undefined && localImageUrl != '')
+        {
+            console.log("Local: ", localImageUrl)
+            setDownloadImageUrl(localImageUrl)
+        }
         else
         {
             setDownloadImageUrl('')
         }
         
-    }, [])
+    }, [localImageUrl])
 
     const ownMessage = () => {
         return(
@@ -125,6 +132,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginBottom: 10,
         borderRadius: 20,
+        borderWidth: 2,
+        borderColor: "#4b8bfa",
         justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'column',
@@ -167,8 +176,9 @@ const styles = StyleSheet.create({
         color: '#000'
     },
     image: {
-        width: 200,
-        height: 200,
+        width: '100%',
+        height: undefined,
+        aspectRatio: 4 / 3
     },
     sentByName: {
         marginLeft: 15,

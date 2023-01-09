@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     quote: {
         // height: 100,
-        backgroundColor: '#cccccc',
+        backgroundColor: '#e7e7e7',
         padding: 10,
         marginHorizontal: 10,
         marginBottom: 10,

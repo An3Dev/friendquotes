@@ -36,7 +36,7 @@ export default function GroupView(props) {
         snapshot.docs.forEach(doc => {
             data.push(doc.data())
         })
-        data.reverse()
+        // data.reverse()
         if (data.length > 0)
         {
             setTopMessage(data[0].id)
@@ -48,7 +48,6 @@ export default function GroupView(props) {
 
   useEffect(() => {
     messagesRef.orderBy('sentAt', 'desc').limit(20).onSnapshot(snapshot => {  
-
         getMostRecentMessages(snapshot)
     })
     navigation.setOptions({
@@ -62,11 +61,7 @@ export default function GroupView(props) {
                 onGroupSettingsButtonClicked={() => onGroupSettingsButtonClicked()}
                 onClickFilter />
         })
-
-        flatListRef.current.scrollToEnd()
   }, [])  
-
-
 
   const onGroupSettingsButtonClicked = () => 
   {
@@ -88,7 +83,7 @@ export default function GroupView(props) {
     }
 
     // console.log(flatListRef.current)
-    flatListRef.current.scrollToEnd()   
+    // flatListRef.current.scrollToEnd()   
   }
 
   const onQuoteButtonClicked = () => {
@@ -99,8 +94,8 @@ export default function GroupView(props) {
     let scrollOffset = event.nativeEvent.contentOffset.y
     if (scrollOffset < 100 && !isRefreshingList)
     {
-        console.log("Reached top")
-        setIsRefreshingList(true)
+        console.log("Reached bottom")
+        // setIsRefreshingList(true)
         // load 10 older messages
     }
     if (isRefreshingList && scrollOffset > 100)
@@ -117,6 +112,7 @@ export default function GroupView(props) {
     console.log("Reached end")
     setIsRefreshingList(true)
   }
+
   return (
     <View style={styles.container} >
         {/* <TextInput><Text>Test</Text></TextInput> */}
@@ -127,13 +123,13 @@ export default function GroupView(props) {
                 enableOnAndroid={true}
                 showsVerticalScrollIndicator={true}
                 onEndReached={() => onEndReached()}
-                onEndReachedThreshold={0.1}
-                // inverted={true}
+                onEndReachedThreshold={0.2}
+                inverted={true}
                 onScroll={(event) => onScroll(event)}
                 data={messagesData}
                 refreshing={isRefreshingList}
                 style={styles.flatList}
-                contentContainerStyle={{marginVertical: 10}}
+                contentContainerStyle={{marginVertical: 10, paddingBottom: 20}}
                 numColumns={1}                
                 renderItem = { ({item}) => (
                     <QuoteMessage key={item.id} {...item} userData={userData}/>

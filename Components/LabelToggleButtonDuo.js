@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, TextInput } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 const LabelToggleButtonDuo = (props) => {
-    const [isChecked, setIsChecked] = useState(true)
+    const [isEnabled, setIsEnabled] = useState(true)
   return (
     <View style={styles.container}>
       
@@ -15,17 +15,35 @@ const LabelToggleButtonDuo = (props) => {
             iconStyle={{borderRadius: 7} }
             innerIconStyle={{borderRadius: 7} }
             disableBuiltInState
-            isChecked={isChecked}
-            onPress={() => { setIsChecked(!isChecked), props.onCheckStateChange(!isChecked) }}  />
+            isChecked={isEnabled}
+            onPress={() => { setIsEnabled(!isEnabled), props.onEnableChanged(!isEnabled) }}  />
       }   
-            <Text style={isChecked ? styles.label : styles.labelDisabled}>{props.label}</Text>
+            <Text style={isEnabled ? styles.label : styles.labelDisabled}>{props.label}</Text>
 
-            {(isChecked || props.disableToggle) && <TextInput style={styles.input} {...props} />}
+            {(isEnabled || props.disableToggle) && (
+            <View style={styles.buttonsContainer}>
+                
+                    <TouchableOpacity
+                    style={styles.imageButton}
+                    onPress={() => props.onPressImageButton(false)}>
+                        <Text style={styles.imageButtonText}>Add</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                    style={styles.imageButton}
+                    onPress={() => props.onPressImageButton(true)}>
+                        <Text style={styles.imageButtonText}>Take</Text>
+                    </TouchableOpacity>
+                
+            </View>
+            )
+            }
+            
     </View>
   )
 }
 
-export default LabelToggleTextInput
+export default LabelToggleButtonDuo
 
 const styles = StyleSheet.create({
     container: {
@@ -68,5 +86,29 @@ const styles = StyleSheet.create({
     },
     checkBox: {
         // marginLeft: 10,
+    }, 
+    buttonsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'stretch',
+        // backgroundColor: 'black',
+        flexDirection: 'row'
+    },
+    imageButton: {
+        flex: 1,
+        backgroundColor: '#788eec',
+        marginHorizontal: 20,
+        // marginLeft: 30,
+        // marginRight: 30,
+        // marginTop: 5,
+        // height: 48,
+        borderRadius: 20,
+        alignItems: "center",
+        justifyContent: 'center',
+        paddingVertical: 5
+    },
+    imageButtonText: {
+        fontSize: 20,
+        color: 'white'
     }
 })

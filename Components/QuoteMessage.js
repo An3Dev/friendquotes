@@ -5,6 +5,8 @@ import { getDownloadURL, ref } from 'firebase/storage';
 
 const QuoteMessage = ({dateSaid, description, localImageUrl, imageUrl, quote, saidBy, sentAt, sentBy, sentByName, type, userData}) => {
     const [downloadImageUrl, setDownloadImageUrl] = useState('')
+    // const quoteImagesPath = 'QuoteImages/'
+
     // const pathRef = ref(storage, `/${imageUrl}`)
     useEffect(() =>{
         console.log("Test")

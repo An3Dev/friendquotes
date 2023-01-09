@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, KeyboardAvoidingView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TextInput, findNodeHandle, TouchableOpacity, Keyboard, Pressable, KeyboardAvoidingView, ScrollView } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react';
 import { firebase } from '../config';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,7 +7,7 @@ import { Divider } from '@rneui/themed/dist/Divider';
 import { Entypo } from '@expo/vector-icons';
 import GroupCustomHeader from '../Components/GroupCustomHeader';
 import GroupCustomHeaderButtons from '../Components/GroupCustomHeaderButtons';
-import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareFlatList, KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import { KeyboardAvoidingView,  } from 'react-native';
 import MessageInputBox from '../Components/MessageInputBox';
 import QuoteMessage from '../Components/QuoteMessage';
@@ -17,6 +17,7 @@ import LabelToggleTextInput from '../Components/LabelToggleTextInput';
 import * as ImagePicker from 'expo-image-picker';
 
 import { takeOrPickImage } from '../Utilities/ImageTakerAndPicker';
+import LabelToggleButtonDuo from '../Components/LabelToggleButtonDuo';
 const CreateQuote = (props) => {
     const [userData] = useState(props.route.params.userData)
     const [groupData] = useState(props.route.params.groupData);
@@ -32,6 +33,8 @@ const CreateQuote = (props) => {
     const [image, setImage] = useState(null)
 
     const [status, requestPermission] = ImagePicker.useCameraPermissions();
+
+    let scrollRef = useRef(null)
     // let data = 
     //     {   imageUrl: '', 
     //         quote:'The most exceptional quote.', 
@@ -98,9 +101,9 @@ const CreateQuote = (props) => {
         })
     }
 
-    const onPressImageButton = () => {
+    const onPressImageButton = (shouldTake) => {
         
-        const promise = new Promise((resolve) => takeOrPickImage({shouldTake: false, requestPermission: requestPermission}, resolve)).then((result) => {
+        const promise = new Promise((resolve) => takeOrPickImage({shouldTake: shouldTake, requestPermission: requestPermission}, resolve)).then((result) => {
             // console.log("Result from button press:", result)
             // alert(result)
             // result is an object with fileName, uri, fileSize, width, height, type
@@ -108,123 +111,107 @@ const CreateQuote = (props) => {
         }).catch((error) => {
             console.log(error)
         })
-        // pickImage()
     }
 
-    // const pickImage = async () => {
-    //     // No permissions request is necessary for launching the image library
-    //     requestPermission().then((data) => {
-
-    //         // alert(data.granted.valueOf())
-    //         // if (status.status.substring(0, 6) == 'denied')
-    //         // {
-
-    //         // }
-    //         if (data.granted.valueOf() == false)
-    //         {
-    //             alert("Camera permission denied")
-    //             return
-    //         }
-    //         ImagePicker.launchCameraAsync({
-    //             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //             allowsMultipleSelection: false,
-    //             allowsEditing: true,
-    //             aspect: [4, 3],
-    //             quality: 1,
-    //         })
-    //         let result = ImagePicker.launchImageLibraryAsync({
-    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            
-    //         allowsEditing: true,
-    //         aspect: [4, 3],
-    //         quality: 1,
-    //         });
-        
-    //         console.log(result);
-        
-    //         if (!result.canceled) {
-    //         setImage(result.assets[0].uri);
-    //         }
-    //         })        
-    //   };
+    const scrollToInput = (reactNode) => {
+        // Add a 'scroll' ref to your ScrollView
+        // console.log(scrollRef)
+        scrollRef.current.scrollToFocusedInput(reactNode)
+    }
     
   return (
-    <View style={styles.container}>
-        <Text style={styles.previewText}>Preview:</Text>
-        <View style={styles.previewContainer}>
-            <QuoteMessage {...data} userData={userData} />
-        </View>
+    <KeyboardAwareScrollView 
+        // contentContainerStyle={{flex: 1}}
+        extraHeight={100}
+        ref={scrollRef}
+        >
+        <View style={styles.container}>
+            <Text style={styles.previewText}>Preview:</Text>
+            <View style={styles.previewContainer}>
+                <QuoteMessage {...data} userData={userData} />
+            </View>
 
-
-        <LabelToggleTextInput
-            // onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-            label={'Quote:'}
-            disableToggle={true}
-            onChangeText={(text) => setQuote(text)}          
-            placeholder='An exceptional quote.'
-            placeholderTextColor="#aaaaaa"
-            value={quote}
-            underlineColorAndroid="transparent"
-            autoCapitalize="true"
-        />
-
-        <LabelToggleTextInput
-            onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-            label={'Said by:'}
-            onChangeText={(text) => setSaidBy(text)}   
-            placeholder='Anonymous'
-            placeholderTextColor="#aaaaaa"
-            value={saidBy}
-            underlineColorAndroid="transparent"
-            autoCapitalize="true"
-        />
-
-
-
-        {/* <LabelToggleTextInput
-            onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-            label={'Date said:'}
-            onChangeText={(text) => setSaidBy(text)}   
-            placeholder='Anonymous'
-            placeholderTextColor="#aaaaaa"
-            value={saidBy}
-            underlineColorAndroid="transparent"
-            autoCapitalize="true"
-        />
-
-        <LabelToggleTextInput
-            onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-            label={'Upload image'}
-            onChangeText={(text) => setSaidBy(text)}   
-            placeholder='Anonymous'
-            placeholderTextColor="#aaaaaa"
-            value={saidBy}
-            underlineColorAndroid="transparent"
-            autoCapitalize="true"
-        /> */}
-
-                <TouchableOpacity
-                    style={styles.imageButton}
-                    onPress={() => onPressImageButton()}>
-                    <Text style={styles.buttonText}>Add Image</Text>
-                </TouchableOpacity>
-
-
-        <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => onSendQuotePressed()}>
-                    <Text style={styles.buttonText}>Send Quote</Text>
-                </TouchableOpacity>
-            {/* <TextInput
-                style={styles.input}
-                placeholder='E-mail'
+            <LabelToggleTextInput
+                // onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+                label={'Quote:'}
+                disableToggle={true}
+                onChangeText={(text) => setQuote(text)}          
+                placeholder='An exceptional quote.'
                 placeholderTextColor="#aaaaaa"
-                onChangeText={(text) => setEmail(text)}
-                value={email}
+                value={quote}
                 underlineColorAndroid="transparent"
-                autoCapitalize="none"
+                autoCapitalize="true"
+                onFocus={(event) => {
+                    scrollToInput(findNodeHandle(event.target))
+                }}
+            />
+
+            <LabelToggleTextInput
+                onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+                label={'Said by:'}
+                onChangeText={(text) => setSaidBy(text)}   
+                placeholder='Anonymous'
+                placeholderTextColor="#aaaaaa"
+                value={saidBy}
+                underlineColorAndroid="transparent"
+                autoCapitalize="true"
+                onFocus={(event) => {
+                    scrollToInput(findNodeHandle(event.target))
+                }}
+            />
+
+
+
+            {/* <LabelToggleTextInput
+                onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+                label={'Date said:'}
+                onChangeText={(text) => setSaidBy(text)}   
+                placeholder='Anonymous'
+                placeholderTextColor="#aaaaaa"
+                value={saidBy}
+                underlineColorAndroid="transparent"
+                autoCapitalize="true"
+            />
+
+            <LabelToggleTextInput
+                onCheckStateChange={(checked) => setEnableSaidBy(checked)}
+                label={'Upload image'}
+                onChangeText={(text) => setSaidBy(text)}   
+                placeholder='Anonymous'
+                placeholderTextColor="#aaaaaa"
+                value={saidBy}
+                underlineColorAndroid="transparent"
+                autoCapitalize="true"
             /> */}
-    </View>
+
+            <LabelToggleButtonDuo onPressImageButton={onPressImageButton} 
+                onEnableChanged={(enable) => setEnableImage(enable)} 
+                label={"Image:"}
+            />
+            
+            {/* <TouchableOpacity
+                style={styles.imageButton}
+                onPress={() => onPressImageButton()}>
+                <Text style={styles.buttonText}>Add Image</Text>
+            </TouchableOpacity> */}
+
+
+            <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => onSendQuotePressed()}>
+                        <Text style={styles.buttonText}>Send Quote</Text>
+                    </TouchableOpacity>
+                {/* <TextInput
+                    style={styles.input}
+                    placeholder='E-mail'
+                    placeholderTextColor="#aaaaaa"
+                    onChangeText={(text) => setEmail(text)}
+                    value={email}
+                    underlineColorAndroid="transparent"
+                    autoCapitalize="none"
+                /> */}
+        </View>
+    </KeyboardAwareScrollView>
   )
 }
 

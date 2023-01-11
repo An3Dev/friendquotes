@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: undefined,
-        aspectRatio: 4 / 3
+        aspectRatio: 4 / 3,
+        borderRadius: 20
     },
     sentByName: {
         marginLeft: 15,

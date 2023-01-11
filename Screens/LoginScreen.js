@@ -115,7 +115,7 @@ export default function LoginScreen(props) {
                     style={styles.input}
                     placeholder='E-mail'
                     placeholderTextColor="#aaaaaa"
-                    onChangeText={(text) => setEmail(text)}
+                    onChangeText={(text) => setEmail(text.trim())}
                     value={email}
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"

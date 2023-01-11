@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, KeyboardAvoidingView } from 'react-native'
-import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Keyboard, Pressable, KeyboardAvoidingView, ActivityIndicator } from 'react-native'
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { firebase } from '../config';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -20,14 +20,13 @@ export default function GroupView(props) {
     const [messagesData, setMessagesData] = useState([]);
     const flatListRef = useRef(null);
 
-    const [topMessage, setTopMessage] = useState('')
+    const [topMessage, setTopMessage] = useState({})
     const [bottomMessage, setBottomMessage] = useState('')
 
     const groupRef = firebase.firestore().collection('groups');
     const messagesRef = firebase.firestore().collection('message').doc(groupData.id).collection('messages')
     // const [addData, setAddData] = useState('');
     const navigation = useNavigation();
-
     const [isRefreshingList, setIsRefreshingList] = useState(false)
 
     const getMostRecentMessages = (snapshot) => {
@@ -37,10 +36,12 @@ export default function GroupView(props) {
             data.push(doc.data())
         })
         // data.reverse()
+        
         if (data.length > 0)
         {
-            setTopMessage(data[0].id)
-            setBottomMessage(data[data.length - 1].id)
+            // console.log(data[data.length - 1])
+            setTopMessage(data[data.length - 1])
+            // setBottomMessage(data[data.length - 1].id)
         }
         
         setMessagesData(data)
@@ -50,6 +51,8 @@ export default function GroupView(props) {
     messagesRef.orderBy('sentAt', 'desc').limit(20).onSnapshot(snapshot => {  
         getMostRecentMessages(snapshot)
     })
+
+    // customize header
     navigation.setOptions({
         headerTitle: 
             () => <GroupCustomHeader 
@@ -104,36 +107,75 @@ export default function GroupView(props) {
     }
     // console.log(scrollOffset)
     // flatListRef.current?.scrollToEnd()
-    // .scrollToIndex(animated=false, index=0.5)
+    // .scrollToIndex(animated=false, index=0.5)    
   }
 
   const onEndReached = () => 
   {
     console.log("Reached end")
     setIsRefreshingList(true)
+    loadMoreMessages()
   }
+
+  const loadMoreMessages = () => {
+    messagesRef.orderBy('sentAt', 'desc').startAfter(topMessage.sentAt).limit(20).onSnapshot(snapshot => {  
+        // console.log("Test")
+        //getMostRecentMessages(snapshot)
+        let data = []
+        snapshot.docs.forEach(doc => {
+            data.push(doc.data())
+        })
+        let oldData = messagesData
+        let combinedData = [...oldData, ...data]
+        console.log(combinedData)
+        // data.reverse()
+        if (combinedData.length > 0)
+        {
+            setTopMessage(combinedData[combinedData.length - 1])
+            // setBottomMessage(data[data.length - 1].id)
+            console.log()
+            setMessagesData(combinedData)
+            setIsRefreshingList(false)
+        }    
+        
+    })
+    
+    
+  }
+
+  const renderItem = ({item}) => {
+    return (
+        <QuoteMessage {...item} userData={userData}/>
+        )
+  }
+
+  const keyExtractor = useCallback((item) => item.id, [])
 
   return (
     <View style={styles.container} >
         {/* <TextInput><Text>Test</Text></TextInput> */}
         <KeyboardAvoidingView style={styles.keyboardAvoidingView}>
+            {isRefreshingList && <ActivityIndicator style={styles.loadingIndicator} size={50} color={'#000'}/>}
             <FlatList              
                 enableAutomaticScroll={true}
                 ref={flatListRef}
                 enableOnAndroid={true}
+                // getItemLayout={(data, index) => {
+                //     {length: 100}
+                // }}
+                keyExtractor={keyExtractor}
                 showsVerticalScrollIndicator={true}
-                onEndReached={() => onEndReached()}
+                onEndReached={onEndReached}
                 onEndReachedThreshold={0.2}
+                windowSize={10}
                 inverted={true}
-                onScroll={(event) => onScroll(event)}
+                onScroll={onScroll}
                 data={messagesData}
                 refreshing={isRefreshingList}
                 style={styles.flatList}
                 contentContainerStyle={{marginVertical: 10, paddingBottom: 20}}
                 numColumns={1}                
-                renderItem = { ({item}) => (
-                    <QuoteMessage key={item.id} {...item} userData={userData}/>
-                )}
+                renderItem = {renderItem}
             />  
         </KeyboardAvoidingView>
                  
@@ -181,5 +223,9 @@ const styles = StyleSheet.create({
     keyboardAvoidingView: {
         // backgroundColor: 'transparent',
         flex: 1
+    },
+    loadingIndicator: {
+        position: 'absolute',
+        width: '100%'
     }
 })

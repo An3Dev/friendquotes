@@ -89,6 +89,11 @@ const CreateQuote = (props) => {
 
 
     const onSendQuotePressed = () => {
+        if (quote == '')
+        {
+            return
+        }
+        
         const promise = new Promise((resolve, reject) => sendFirebaseQuote({data, userData, groupData}, resolve, reject))
         .then((didSucceed) => 
         {
@@ -160,30 +165,6 @@ const CreateQuote = (props) => {
                 }}
             />
 
-
-
-            {/* <LabelToggleTextInput
-                onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-                label={'Date said:'}
-                onChangeText={(text) => setSaidBy(text)}   
-                placeholder='Anonymous'
-                placeholderTextColor="#aaaaaa"
-                value={saidBy}
-                underlineColorAndroid="transparent"
-                autoCapitalize="true"
-            />
-
-            <LabelToggleTextInput
-                onCheckStateChange={(checked) => setEnableSaidBy(checked)}
-                label={'Upload image'}
-                onChangeText={(text) => setSaidBy(text)}   
-                placeholder='Anonymous'
-                placeholderTextColor="#aaaaaa"
-                value={saidBy}
-                underlineColorAndroid="transparent"
-                autoCapitalize="true"
-            /> */}
-
             <LabelToggleButtonDuo onPressImageButton={onPressImageButton} 
                 onEnableChanged={(enable) => setEnableImage(enable)} 
                 label={"Image:"}
@@ -197,8 +178,10 @@ const CreateQuote = (props) => {
 
 
             <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => onSendQuotePressed()}>
+                        style={quote == '' ? styles.disabledButton :styles.button}
+                        onPress={() => onSendQuotePressed()}
+                        disabled={quote == ''}
+                        >
                         <Text style={styles.buttonText}>Send Quote</Text>
                     </TouchableOpacity>
                 {/* <TextInput
@@ -256,6 +239,16 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#788eec',
+        marginLeft: 30,
+        marginRight: 30,
+        marginTop: 20,
+        height: 48,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: 'center'
+    },
+    disabledButton:{
+        backgroundColor: '#d1d1d1',
         marginLeft: 30,
         marginRight: 30,
         marginTop: 20,

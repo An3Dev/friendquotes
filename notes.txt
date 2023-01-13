@@ -12,6 +12,9 @@
 -best quote of the week
 - quote view, and all messages view
 
+Ideas:
+ when to get 
+
 
 Things I've learned:
 
@@ -24,4 +27,16 @@ Things I've learned:
 -  if a view is expanding vertically and you 
     don't want that, set its parent to row flex flexDirection
     and alignItems to flex-start
+
+- when I was building the app to deploy on my phone(android), the app would crash as soon as it was opened
+    even though it worked fine through expo go. I don't know exactly what fixed it, but I did these things:
+        - changed the eas.json file to specify that I wanted an android build and an apk, and set 
+            internal testing to true. The latter most likely doesn't matter
+        - I used android log cat to see what error message i got when the app crashed. It said something 
+            related to a screens plugin not being installed. So I looked the error up and installed 
+            many plugins like gesture handler, react navigation stack and native, and others.
+    I think that's all I did to fix it.
+        
+
+
 

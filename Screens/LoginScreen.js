@@ -19,7 +19,7 @@ export default function LoginScreen(props) {
             return jsonValue != null ? JSON.parse(jsonValue) : null;
         } catch(e) {
           // error reading value
-          console.log(e)
+        //   console.log(e)
         }
       }
 
@@ -46,7 +46,7 @@ export default function LoginScreen(props) {
                     // console.log("No info")
                 }
             }).catch((error) => {
-                console.log(error)
+                // console.log(error)
             })
       }
     useEffect(() => {
